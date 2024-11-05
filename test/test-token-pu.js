@@ -89,12 +89,24 @@ async function main() {
   
   console.log('===========start initialize UniswapV3Pool=====================')
   const sqrtPriceX96 = ethers.BigNumber.from("79228162514264337593543950336");     //1:1  
-  let pool;
+  let liquidity,slot0;
+  var poolArray=new Array();
   for (i=0;i<poolAdrArray.length;i++) {
-    pool = await ethers.getContractAt("UniswapV3Pool", poolAdrArray[i]);
+    const pool = await ethers.getContractAt("UniswapV3Pool", poolAdrArray[i]);
     tx = await pool.initialize(sqrtPriceX96);
     receipt = await tx.wait();
     frontendUtil.showResult(frontendUtil.parseReceipt(receipt));
+    poolArray.push(pool);
+  }
+
+  console.log('===========pool state=====================');
+  for (i=0;i<poolArray.length;i++) {
+    liquidity = await poolArray[i].liquidity();
+    console.log(`Total Liquidity: ${liquidity.toString()}`);
+
+    slot0 = await poolArray[i].slot0();
+    console.log(`Sqrt Price X96: ${slot0.sqrtPriceX96.toString()}`);
+    console.log(`Current Tick: ${slot0.tick}`);
   }
   
   console.log('===========start deploy WETH9=====================');
@@ -148,6 +160,16 @@ async function main() {
     await addLiquidity(nonfungiblePositionManager,tokenInsArray[i],tokenInsArray[i+1],fee,"5","5",accounts[i]);
 
     await addLiquidity(nonfungiblePositionManager,tokenInsArray[i+1],tokenInsArray[i+2],fee,"5","5",accounts[i]);
+  }
+
+  console.log('===========pool state=====================');
+  for (i=0;i<poolArray.length;i++) {
+    liquidity = await poolArray[i].liquidity();
+    console.log(`Total Liquidity: ${liquidity.toString()}`);
+
+    slot0 = await poolArray[i].slot0();
+    console.log(`Sqrt Price X96: ${slot0.sqrtPriceX96.toString()}`);
+    console.log(`Current Tick: ${slot0.tick}`);
   }
   
   console.log('===========after addLiquidity balance of token=====================')
@@ -263,10 +285,39 @@ async function main() {
     console.log(`Balance of account ${accounts[i+2].address}: ${formattedBalance} ${tokens[i+1].name}`);
   }
 
+  // console.log('===========start deploy Quoter=====================');
+  // const quoter_factory = await hre.ethers.getContractFactory("Quoter");
+  // const quoter = await quoter_factory.deploy(
+  //   swapfactory.address,   
+  //   weth9.address            
+  // );
+  // await quoter.deployed();
+  // console.log("Quoter deployed to:", quoter.address);
+
+  // await getQuote(quoter,tokenInsArray[0],tokenInsArray[1],fee,"1");
   
-  
+  console.log('===========pool state=====================');
+  for (i=0;i<poolArray.length;i++) {
+    liquidity = await poolArray[i].liquidity();
+    console.log(`Total Liquidity: ${liquidity.toString()}`);
+
+    slot0 = await poolArray[i].slot0();
+    console.log(`Sqrt Price X96: ${slot0.sqrtPriceX96.toString()}`);
+    console.log(`Current Tick: ${slot0.tick}`);
+  }
 }
 
+async function getQuote(quoterContract,tokenA,tokenB,fee,amountIn) {
+  const amountOut = await quoterContract.quoteExactInputSingle(
+      tokenA.address,
+      tokenB.address,
+      fee,
+      ethers.utils.parseUnits(amountIn.toString(), tokenA.decimals),
+      0
+  );
+
+  console.log(`Quote for ${amountIn} ${tokenA.name} to ${tokenB.name}: ${ethers.utils.formatUnits(amountOut, tokenB.decimals)} ${tokenB.name}`);
+}
 
 async function addLiquidity(nonfungiblePositionManager,tokenInsA,tokenInsB,fee, amountA, amountB,from) {
   
