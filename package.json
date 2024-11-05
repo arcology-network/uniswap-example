@@ -1,0 +1,25 @@
+{
+  "name": "hardhat-project",
+  "devDependencies": {
+    "@nomiclabs/hardhat-ethers": "^2.0.6",
+    "@nomiclabs/hardhat-waffle": "^2.0.3",
+    "chai": "^4.3.6",
+    "ethereum-waffle": "^3.4.4",
+    "ethers": "^5.6.9",
+    "hardhat": "^2.9.9",
+    "base64-sol": "1.0.1"
+  },
+  "dependencies": {
+    "@arcologynetwork/concurrentlib": "^2.0.8",
+    "@arcologynetwork/frontend-tools": "^1.0.3",
+    "@arcologynetwork/frontend-util": "^1.0.3",
+    "@openzeppelin/contracts": "3.4.2-solc-0.7",
+    "@uniswap/lib": "^4.0.1-alpha",
+    "@uniswap/v2-core": "^1.0.1",
+    "@uniswap/v3-core": "^1.0.0",
+    "@uniswap/v3-periphery": "^1.4.1",
+    "@uniswap/sdk-core": "^3.1.0",
+    "@uniswap/v3-sdk": "^3.9.0",
+    "base64-sol": "1.0.1"
+  }
+}
